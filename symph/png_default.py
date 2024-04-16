@@ -26,7 +26,7 @@ def main_png_default(void, x, y, path, sym):
                         screen.addch(y, x, choice(printable))
                         screen.refresh()
                     else:
-                        screen.addch(y, x, sym)
+                        screen.addstr(y, x, choice(sym))
                         screen.refresh()
         y += 1
     screen.getch()

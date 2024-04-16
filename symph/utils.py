@@ -5,14 +5,14 @@ import shutil
 
 try:
     import curses
-except ImportError:
+except (ImportError, ModuleNotFoundError):
     print("ERROR: install the curses package on the system: 'pip install windows-curses'")
     exit()
 from curses import wrapper
 
 try:
     import cv2
-except ImportError: 
+except (ImportError, ModuleNotFoundError): 
     print("ERROR: install the opencv package on the system: 'pip install opencv-python'")
     exit()
 
