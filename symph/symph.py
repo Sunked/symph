@@ -1,17 +1,30 @@
+from platform import platform
+import yaml
 import argparse
 import os
 if os.path.dirname(__file__).startswith("/usr/lib/python3/dist-packages/"):
-    from .setup import setup
     from .art_squares import *
     from .png_default import *
     from .png_squares import *
 else:
-    from setup import setup
     from art_squares import *
     from png_default import *
     from png_squares import *
 
-helper = f"""
+def doc_help():
+    if platform() == "Windows":
+        path = r".\data\setup.yaml"
+    else:
+        path = r"./data/setup.yaml"
+    
+    with open(path) as file:
+        setup = yaml.safe_load(file)
+        version = setup["version"]
+        github = setup["github"]
+        author = setup["author"]
+        name = setup["name"]
+        
+        helper= f"""
                                                                             
  ░▇▇▇▇▇▇ ░▇▇▇░ ░▇▇▇░ ▇▇▇▇▇░ ░▇▇▇▇▇ ░▇▇▇▇▇▇▇▇  ▇▇▇░ ░▇▇░                     
 ░▇▇▇▇▇▇▇ ▒▇▇▇░ ▒▇▇▒  ▇▇▇▇▇░ ░▇▇▇▇▇ ▓▇▇▇▇▇▇▇▇░ ▇▇▇░ ░▇▇▒                     
@@ -21,9 +34,9 @@ helper = f"""
 ░▓▇▇▇▇▇▇▓   ▒▇▇▓░  ▓▇▇▓  ▇▇▇▇  ▇▇▇  ▇▇▇       ▓▇▇░ ░▇▇▒ 
 
 
-version -> {setup["version"]}
-github -> {setup["github"]}
-author -> {setup["author"]}
+version -> {version}
+github -> {github}
+author -> {author}
 
 
 
@@ -48,6 +61,12 @@ options:
 
 
 
+Required modules:
+
+opencv (pip install opencv-python)
+curses (pip install windows-curses) (Windows)
+
+
 Use smaller photos. 
 It is advisable to use photographs no larger than 800x800. 
 When using large volumes of photos, the following may occur: 
@@ -68,42 +87,89 @@ When generating inscriptions, there can be big problems,
 an example of this is the inscription for this documentation, in which some adjustment was used.
 
 The program on Windows works almost the same, but recognizes photo a little worse.
+
+
+
+You can use the configuration file (in the directory 'data') to set the default data and not have to constantly enter it.
+
 """
+        return helper
 
 def main_msg():
     parser = argparse.ArgumentParser(description="Settings symph", add_help=False)
     parser.add_argument("-h", "--help", action="store_true")
-    parser.add_argument("photo", help="indicate the path to your photo", nargs="?")
+    parser.add_argument("photo", help="indicate the path to your photo", nargs="?", default=None)
     parser.add_argument("-s", "--size", 
                         help="indicate the amount of photo cropping", 
                         default=(0, 0), 
                         nargs='+')
     parser.add_argument("-m", "--mode", 
                         help="indicate one of three symbols generation modes (default(0), png_squares(1), art_squares(2))", 
-                        default="default")
+                        default=None)
     parser.add_argument("-sb", "--symbol", 
                         help="specify the generated symbol for the classic mode. You can pass 'ASCII'", 
-                        default="ascii")
+                        default=None)
 
     args = parser.parse_args()
-    if args.help or len(sys.argv) == 1:
-        print(helper)
-        exit()
+    
+    if platform() == "Windows":
+        pathC = r".\data\config.yaml"
+    else:
+        pathC = "./data/config.yaml"
+
+    with open(pathC) as fileC:
+        conf = yaml.safe_load(fileC)
+        if args.help or len(sys.argv) == 1:
+            if conf["PATH"] == "None":
+                print(doc_help())
+                exit()
     
     return args
 
 def generation():
     args = main_msg()
+    
+    if platform() == "Windows":
+        path = r".\data\config.yaml"
+    else:
+        path = "./data/config.yaml"
+    
+    with open(path) as file:
+        config = yaml.safe_load(file)
+        # photo path
+        if args.photo is None:
+            photo_path = config["PATH"]
+        else:
+            photo_path = args.photo
+        # size
+        if args.size == (0, 0):
+            if config["SIZE"]["X"] != 0 or config["SIZE"]["Y"] != 0:
+                size = (config["SIZE"]["X"], config["SIZE"]["Y"])
+            else:
+                size = (0, 0)
+        else:
+            size = args.size
+        # mode
+        if args.mode is None:
+            mode = config["MODE"]
+        else:
+            mode = args.mode
+        
+        # symbol
+        if args.symbol is None:
+            symbol = config["SYMBOL"]
+        else:
+            symbol = args.symbol
     try:
-        if args.mode.lower() == "default" or str(args.mode) == "0":
-            wrapper(main_png_default, int(args.size[0]), int(args.size[1]), args.photo, args.symbol)
-        elif args.mode.lower() == "png_squares" or str(args.mode) == "1":
-            wrapper(main_png_squares, int(args.size[0]), int(args.size[1]), args.photo)
-        elif args.mode.lower() == "art_squares" or str(args.mode) == "2":
-            wrapper(main_art_squares, int(args.size[0]), int(args.size[1]), args.photo)
+        if mode.lower() == "default" or str(args.mode) == "0":
+            wrapper(main_png_default, int(size[0]), int(size[1]), photo_path, symbol)
+        elif mode.lower() == "png_squares" or str(args.mode) == "1":
+            wrapper(main_png_squares, int(size[0]), int(size[1]), photo_path)
+        elif mode.lower() == "art_squares" or str(args.mode) == "2":
+            wrapper(main_art_squares, int(size[0]),int(size[1]), photo_path)
     
     except AttributeError:
-        print("ERROR: --INCORRECT FILE PATH--\nplease, indicate the full path to the photo with its format")
+        print("ERROR: --INCORRECT FILE PATH OR CONFIGURATION--\nplease, indicate the full path to the photo with its format or write the configuration file correctly")
         sys.exit()
 
     except IndexError:
