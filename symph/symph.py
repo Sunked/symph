@@ -1,7 +1,12 @@
 from platform import platform
-import yaml
-import argparse
 import os
+import argparse
+
+try:
+    import yaml
+except(ImportError, ModuleNotFoundError):
+    print("ERROR: install the pyyaml package on the system: 'pip install pyyaml'")
+
 if os.path.dirname(__file__).startswith("/usr/lib/python3/dist-packages/"):
     from .art_squares import *
     from .png_default import *
@@ -59,12 +64,9 @@ options:
 -sb, --symbol         specify the generated symbol for the classic mode.
                         You can pass 'ASCII'
 
+--config [CONFIG ...]  configure the program
 
 
-Required modules:
-
-opencv (pip install opencv-python)
-curses (pip install windows-curses) (Windows)
 
 
 Use smaller photos. 
@@ -92,12 +94,17 @@ The program on Windows works almost the same, but recognizes photo a little wors
 
 You can use the configuration file (in the directory 'data') to set the default data and not have to constantly enter it.
 
+Read more in README.md
+
 """
         return helper
 
 def main_msg():
     parser = argparse.ArgumentParser(description="Settings symph", add_help=False)
     parser.add_argument("-h", "--help", action="store_true")
+    parser.add_argument("--config",
+                        help="configure the program",
+                        nargs="+")
     parser.add_argument("photo", help="indicate the path to your photo", nargs="?", default=None)
     parser.add_argument("-s", "--size", 
                         help="indicate the amount of photo cropping", 
@@ -111,7 +118,7 @@ def main_msg():
                         default=None)
 
     args = parser.parse_args()
-    
+    # --help
     if platform() == "Windows":
         pathC = r".\data\config.yaml"
     else:
@@ -123,6 +130,31 @@ def main_msg():
             if conf["PATH"] == "None":
                 print(doc_help())
                 exit()
+    # --config
+    if args.config:
+        with open(pathC, "w") as _fileC:
+            try:
+                conf[args.config[0].upper()]
+            except:
+                print("--INCORRECT CONFIGURATION-- enter the correct settings, you can see it in the README.md")
+                yaml.safe_dump(conf, _fileC)
+                exit()
+            try:
+                if args.config[0].lower() == "size":
+                    conf[args.config[0].upper()]["X"]=args.config[1]
+                    conf[args.config[0].upper()]["Y"]=args.config[2]
+                    yaml.safe_dump(conf, _fileC)
+                else:
+                    conf[args.config[0].upper()]=args.config[1]
+                    yaml.safe_dump(conf, _fileC)
+
+            except:
+                yaml.safe_dump(conf, _fileC)
+                print("--AN ERROR HAS OCCURRED--")
+                exit()
+            
+            print("\u001b[1;32mDONE")
+            exit()
     
     return args
 

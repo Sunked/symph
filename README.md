@@ -30,6 +30,7 @@ To configure, you can use the options, which can be found below, or by using the
 For the program to work, you should install the necessary libraries:
 ```
 pip install opencv-python
+pip install pyyaml
 ```
 #### Only for windows:
 ```
@@ -89,6 +90,12 @@ the default is ASCII symbols.
 ```
 symph PATH -m 0 -sb A
 ```
+## Config (--config)
+Use to set the default program. More details will be provided below.
+```
+symph --config OPT ARG
+```
+
 ## standard code examples
 ```
 symph /home/user/photo.jpg -m 2 -s 50 0
@@ -109,6 +116,27 @@ does not react to **black** shades.
 
 ## art_squares
 Just like **png_squares** creates squares, but at the same time reacts to **all** shades. <br>
+
+# Configuration
+In the **"data"** directory there is a file **"config.yaml"**, which contains settings for the program that are applied by default. <br>
+You can completely customize this file to use some default data. <br>
+Among the settings there are all the previous options, that is: **photo path, size, mode and symbol**.
+
+## Warning
+Do not change the **basic data** in the configuration file, otherwise the program will stop working correctly.
+
+## "--config" option
+You can customize the configuration file via the **"--config"** option in the terminal itself. <br>
+**When changing the configuration file through the terminal, its basic appearance may change greatly!** <br>
+Use the option name first, then give it an argument without extra spaces. <br>
+Unfortunately, you can only set settings through the terminal **one at a time**, otherwise there will be an **error**. <br>
+<br>
+Usage example:
+```
+symph --config mode png_squares
+symph --config path /home/user/Documents/photo.jpg
+symph --config size 10 5
+```
 <br>
 <h1 align="center">Thank you for your attention!</h1>
 <h3 align="center">Good use.</h3>
