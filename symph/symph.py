@@ -4,7 +4,7 @@ import argparse
 
 try:
     import yaml
-except(ImportError, ModuleNotFoundError):
+except(ImportError, ModuleNotFoundError, NameError):
     print("ERROR: install the pyyaml package on the system: 'pip install pyyaml'")
 
 if os.path.dirname(__file__).startswith("/usr/lib/python3/dist-packages/"):
