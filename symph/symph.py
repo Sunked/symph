@@ -153,7 +153,7 @@ def main_msg():
                 print("--AN ERROR HAS OCCURRED--")
                 exit()
             
-            print("\u001b[1;32mDONE")
+            print("\u001b[1;32m" + "DONE")
             exit()
     
     return args
