@@ -1,18 +1,6 @@
-# Default option settings so as not to constantly enter options.
-
-
-# full path to your photo
-PATH: None
-
-
-SIZE:
-  X: 0
-  Y: 0
-
-
-# (default, png_squares, art_squares)
 MODE: default
-
-
-# only in default mode
+PATH: None
+SIZE:
+  X: '0'
+  Y: '0'
 SYMBOL: ASCII

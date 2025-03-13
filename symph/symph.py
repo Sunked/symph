@@ -118,11 +118,9 @@ def main_msg():
                         default=None)
 
     args = parser.parse_args()
+    
     # --help
-    if platform() == "Windows":
-        pathC = r".\data\config.yaml"
-    else:
-        pathC = "./data/config.yaml"
+    pathC = f".{os.sep}data{os.sep}config.yaml"
 
     with open(pathC) as fileC:
         conf = yaml.safe_load(fileC)
